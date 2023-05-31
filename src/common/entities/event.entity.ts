@@ -8,27 +8,72 @@ import {
 
 @Entity("event")
 export class EventEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn("uuid", {
+    name: "id",
+  })
   id: string;
 
   // @Column({
   //   type: "uuid",
+  //   name: "entity_id",
+  //   nullable: false,
   // })
-  // aggregateId: string;
-
-  @Column({
-    type: "integer",
-  })
-  version: number;
+  // entityId: string;
 
   @Column({
     type: "varchar",
-    name: "event_type",
+    name: "entity_type",
+    nullable: false,
   })
-  eventType: string;
+  entityType: string;
 
-  @Column("jsonb")
-  payload: Record<string, any>;
+  @Column({
+    type: "varchar",
+    name: "transaction_type",
+    nullable: false,
+  })
+  queryType: string;
+
+  @Column({
+    type: "jsonb",
+    name: "origin_data",
+    nullable: true,
+  })
+  originData: JSON;
+
+  @Column({
+    type: "jsonb",
+    name: "update_data",
+    nullable: true,
+  })
+  updateData: JSON;
+
+  @Column({
+    type: "integer",
+    name: "step",
+    nullable: false,
+  })
+  step: number;
+
+  @Column({
+    type: "uuid",
+    name: "compensation_id",
+    nullable: false,
+  })
+  compensationId: string;
+
+  @Column({
+    type: "varchar",
+    name: "status",
+    nullable: false,
+  })
+  status: string;
+
+  @Column({
+    name: "is_deleted",
+    default: false,
+  })
+  isDeleted: boolean;
 
   @CreateDateColumn({
     type: "timestamp",

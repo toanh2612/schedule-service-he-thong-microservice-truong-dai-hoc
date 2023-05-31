@@ -18,7 +18,7 @@ export default class UserEvent {
           await this.redisClient
             .emit(
               {
-                command: CONSTANT.EVENT.USER.GET_LIST_BY_IDS,
+                command: CONSTANT.EVENT.USER.GET_USER_LIST_BY_IDS,
               },
               {
                 ids,

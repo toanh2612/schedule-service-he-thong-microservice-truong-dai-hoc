@@ -5,9 +5,9 @@ import { DataSource } from "typeorm";
 import { addOrderBy, addWhere } from "src/common/utils/utils";
 import { IClassPeriod } from "./interfaces/IClassPeriod.interface";
 import { CreateClassPeriodDto } from "./dto/CreateClassPeriod.dto";
-// import { CONFIG } from "src/common/configs/config";
-// import { Inject } from "@nestjs/common";
-// import { ClientProxy } from "@nestjs/microservices";
+import { ClassroomStudentEntity } from "src/common/entities/classroomStudent.entity";
+import { CONSTANT } from "src/common/utils/constant";
+import { ClassroomTeacherEntity } from "src/common/entities/classroomTeacher.entity";
 
 @Injectable()
 export default class ClassPeriodService {
@@ -17,6 +17,163 @@ export default class ClassPeriodService {
     @InjectDataSource()
     private dataSource: DataSource
   ) {}
+
+  async getStudentClassroomPeriodList(
+    student,
+    filter: any,
+    order: any,
+    page: number,
+    perPage: number,
+    filterOptions?: any
+  ): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        filterOptions = filterOptions || {};
+        const relativeFields: string[] = [];
+        const classroomStudentList = await this.dataSource
+          .getRepository(ClassroomStudentEntity)
+          .createQueryBuilder("classroom_student")
+          .where("classroom_student.student_id = :studentId", {
+            studentId: student.id,
+          })
+          .andWhere("classroom_student.status = :status", {
+            status: CONSTANT.ENTITY.CLASSROOM_STUDENT.STATUS.FINISHED,
+          })
+          .getMany();
+
+        const classroomIdList = classroomStudentList.map((classroomStudent) => {
+          return classroomStudent.classroomId;
+        });
+
+        if (classroomIdList && !classroomIdList.length) {
+          return resolve({
+            result: [],
+            paging: {
+              page,
+              perPage,
+              total: 0,
+            },
+          });
+        }
+
+        let getClassPeriodListQuery = await this.dataSource
+          .getRepository(ClassPeriodEntity)
+          .createQueryBuilder("classPeriod")
+          .where("classPeriod.is_deleted = false")
+          .where("classroom.id IN (:...classroomIdList)", {
+            classroomIdList,
+          })
+          .leftJoinAndSelect("classPeriod.address", "address")
+          .leftJoinAndSelect("classPeriod.classroom", "classroom")
+          .leftJoinAndSelect(
+            "classPeriod.classPeriodTimeRange",
+            "classPeriodTimeRange"
+          )
+          .skip((page - 1) * perPage)
+          .take(perPage);
+
+        getClassPeriodListQuery = addWhere(
+          getClassPeriodListQuery,
+          filter,
+          relativeFields
+        );
+        getClassPeriodListQuery = addOrderBy(getClassPeriodListQuery, order);
+
+        const classPeriodFoundList: IClassPeriod[] =
+          await getClassPeriodListQuery.getMany();
+        const classPeriodFoundCount: number =
+          await getClassPeriodListQuery.getCount();
+
+        return resolve({
+          result: classPeriodFoundList,
+          paging: {
+            page,
+            perPage,
+            total: classPeriodFoundCount,
+          },
+        });
+      } catch (error) {
+        return reject(error);
+      }
+    });
+  }
+
+  async getTeacherClassroomPeriodList(
+    teacher,
+    filter: any,
+    order: any,
+    page: number,
+    perPage: number,
+    filterOptions?: any
+  ): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        filterOptions = filterOptions || {};
+        const relativeFields: string[] = [];
+        const classroomTeacherList = await this.dataSource
+          .getRepository(ClassroomTeacherEntity)
+          .createQueryBuilder("classroom_teacher")
+          .where("classroom_teacher.teacher = :teacherId", {
+            teacherId: teacher.id,
+          })
+          .getMany();
+
+        const classroomIdList = classroomTeacherList.map((classroomTeacher) => {
+          return classroomTeacher.classroomId;
+        });
+
+        if (classroomIdList && !classroomIdList.length) {
+          return resolve({
+            result: [],
+            paging: {
+              page,
+              perPage,
+              total: 0,
+            },
+          });
+        }
+
+        let getClassPeriodListQuery = await this.dataSource
+          .getRepository(ClassPeriodEntity)
+          .createQueryBuilder("classPeriod")
+          .where("classPeriod.is_deleted = false")
+          .where("classroom.id IN (:...classroomIdList)", {
+            classroomIdList,
+          })
+          .leftJoinAndSelect("classPeriod.address", "address")
+          .leftJoinAndSelect("classPeriod.classroom", "classroom")
+          .leftJoinAndSelect(
+            "classPeriod.classPeriodTimeRange",
+            "classPeriodTimeRange"
+          )
+          .skip((page - 1) * perPage)
+          .take(perPage);
+
+        getClassPeriodListQuery = addWhere(
+          getClassPeriodListQuery,
+          filter,
+          relativeFields
+        );
+        getClassPeriodListQuery = addOrderBy(getClassPeriodListQuery, order);
+
+        const classPeriodFoundList: IClassPeriod[] =
+          await getClassPeriodListQuery.getMany();
+        const classPeriodFoundCount: number =
+          await getClassPeriodListQuery.getCount();
+
+        return resolve({
+          result: classPeriodFoundList,
+          paging: {
+            page,
+            perPage,
+            total: classPeriodFoundCount,
+          },
+        });
+      } catch (error) {
+        return reject(error);
+      }
+    });
+  }
 
   async getList(
     filter: any,

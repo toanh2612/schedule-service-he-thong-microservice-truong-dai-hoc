@@ -2,6 +2,7 @@ import { Injectable, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import UserEvent from "../user/user.event";
 import { CONSTANT } from "src/common/utils/constant";
+
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly userEvent: UserEvent) {}
@@ -11,7 +12,7 @@ export class AuthMiddleware implements NestMiddleware {
       const authorization = headers?.["authorization"];
 
       if (!authorization) {
-        return res.json(CONSTANT.ERROR.E0006);
+        return res.json(CONSTANT.ERROR.USER.UNAUTHORIZATED);
       }
 
       const accessToken = authorization.split(" ")[1];

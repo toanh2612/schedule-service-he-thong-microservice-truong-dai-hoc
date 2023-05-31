@@ -13,6 +13,9 @@ import { ClassroomController } from "./classroom.controller";
 import ClassroomService from "./classroom.service";
 import UserEvent from "../user/user.event";
 import { AuthMiddleware } from "../auth/auth.middleware";
+import RabbitMQService from "../rabbitMQ/rabbitMQ.service";
+import EventEmitterService from "../eventEmitter/evenEmitter.service";
+import EventStoreService from "../eventStore/eventStore.service";
 
 @Module({
   imports: [
@@ -33,7 +36,15 @@ import { AuthMiddleware } from "../auth/auth.middleware";
     TypeOrmModule.forFeature([ClassroomEntity]),
   ],
   controllers: [ClassroomController],
-  providers: [ClassroomService, UserEvent, Logger],
+  providers: [
+    EventEmitterService,
+    EventStoreService,
+    UserEvent,
+    ClassroomService,
+
+    Logger,
+    RabbitMQService,
+  ],
 })
 export class ClassroomModule implements NestModule {
   constructor() {}

@@ -5,7 +5,6 @@ import { DataSource } from "typeorm";
 import { AddressEntity } from "../entities/address.entity";
 import { ClassroomEntity } from "../entities/classroom.entity";
 import { SubjectEntity } from "../entities/subject.entity";
-import { TransactionEntity } from "../entities/transaction.entity";
 import { CONFIG, CONFIGURATION } from "./config";
 import { AttendanceEntity } from "../entities/attendance.entity";
 import { ClassroomTeacherEntity } from "../entities/classroomTeacher.entity";
@@ -13,6 +12,7 @@ import { ClassroomStudentEntity } from "../entities/classroomStudent.entity";
 import { ClassPeriodTimeRangeEntity } from "../entities/classPeriodTimeRange.entity";
 import { ClassPeriodEntity } from "../entities/classPeriod.entity";
 import { MasterConfigEntity } from "../entities/masterConfig.entity";
+import { EventEntity } from "../entities/event.entity";
 // import { ClassPeriodEntity } from "../entities/classPeriod.entity";
 
 @Global()
@@ -40,13 +40,13 @@ import { MasterConfigEntity } from "../entities/masterConfig.entity";
           AddressEntity,
           ClassPeriodEntity,
           SubjectEntity,
-          TransactionEntity,
           ClassroomEntity,
           ClassPeriodTimeRangeEntity,
           AttendanceEntity,
           ClassroomTeacherEntity,
           ClassroomStudentEntity,
           MasterConfigEntity,
+          EventEntity,
         ],
         synchronize: CONFIG["NODE_ENV"] === "production" ? false : true,
         // migrationsRun: true
